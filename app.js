@@ -24,7 +24,9 @@ const EXPENSE_CATS = [
   { id: 'equipment',   label: 'أدوات ومعدات',    emoji: '🍳' },
   { id: 'other',       label: 'أخرى',            emoji: '🧾' },
 ];
-const COLORS = ['#7A4A2A', '#E07B39', '#6E9A3A', '#D45D8C', '#7D5BA6', '#3C7DBF', '#C9A227', '#B23A3A'];
+const COLORS = ['#C9A189', '#F2B488', '#A8C98F', '#F1A9C2', '#BBA8E3', '#9EC5E8', '#EBCD80', '#E7A0A0'];
+// تحويل الألوان القديمة الغامقة لنسختها الباستيل
+const OLD_COLORS = { '#7A4A2A': '#C9A189', '#E07B39': '#F2B488', '#6E9A3A': '#A8C98F', '#D45D8C': '#F1A9C2', '#7D5BA6': '#BBA8E3', '#3C7DBF': '#9EC5E8', '#C9A227': '#EBCD80', '#B23A3A': '#E7A0A0' };
 const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 const PERIODS = { month: 'هذا الشهر', last: 'الشهر الماضي', year: 'هذي السنة', all: 'الكل' };
 const ORDER_FILTERS = { active: 'الحالية', unpaid: 'غير مدفوعة', delivered: 'تم التسليم', cancelled: 'ملغية', all: 'الكل' };
@@ -115,12 +117,12 @@ function defaultState() {
   return {
     app: APP_ID,
     version: DATA_VERSION,
-    settings: { name: 'Niwa Cookies', currency: 'ر.س', notify: false, monthlyBudget: 0, backupDays: 7, theme: 'auto' },
+    settings: { name: 'Niwa Cookies', currency: 'ر.س', notify: false, monthlyBudget: 0, backupDays: 7, theme: 'light' },
     meta: { nextOrderNo: 1, lastBackup: null, createdAt: Date.now() },
     products: [
-      product('كلاسيك بلجيكي', 'كوكيز بالشوكولاتة البلجيكية', '#7A4A2A', 1.5, 5, [{ qty: 4, price: 17 }, { qty: 8, price: 31 }]),
-      product('كندر', 'كوكيز بالشوكولاتة البلجيكية وكندر', '#E07B39', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
-      product('ماتشا', 'كوكيز بالشوكولاتة البلجيكية وماتشا', '#6E9A3A', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
+      product('كلاسيك بلجيكي', 'كوكيز بالشوكولاتة البلجيكية', '#C9A189', 1.5, 5, [{ qty: 4, price: 17 }, { qty: 8, price: 31 }]),
+      product('كندر', 'كوكيز بالشوكولاتة البلجيكية وكندر', '#F2B488', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
+      product('ماتشا', 'كوكيز بالشوكولاتة البلجيكية وماتشا', '#A8C98F', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
     ],
     orders: [],
     expenses: [],
@@ -134,7 +136,10 @@ function normalize(d) {
   s.settings = { ...def.settings, ...(d.settings || {}) };
   s.meta = { ...def.meta, ...(d.meta || {}) };
   for (const k of ['products', 'orders', 'expenses', 'batches']) if (!Array.isArray(s[k])) s[k] = [];
+  // التصميم الجديد فاتح افتراضيًا
+  if (!s.meta.pastel) { if (s.settings.theme === 'auto') s.settings.theme = 'light'; s.meta.pastel = true; }
   for (const p of s.products) {
+    if (OLD_COLORS[p.color]) p.color = OLD_COLORS[p.color];
     p.sizes = Array.isArray(p.sizes) ? p.sizes : [];
     for (const z of p.sizes) { z.packs = Array.isArray(z.packs) ? z.packs : []; z.stock = Number(z.stock) || 0; z.low = Number(z.low) || 0; }
   }
