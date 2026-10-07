@@ -1,64 +1,64 @@
 /* ===== Niwa Cookies – لوحة الإدارة ===== */
-/* ألوان باستيل فاتحة: كريمي، خوخي، وردي ولافندر */
+/* ألوان محايدة فاتحة: رملي، بيرل، آش، تيراكوتا، ونصوص بني جوزي */
 :root {
-  --bg: #FFF8F4;
-  --bg-glow-1: #FDE7DD;
-  --bg-glow-2: #EFE6F8;
-  --surface: #FFFFFF;
-  --surface-2: #FCF0EA;
-  --line: #F3E3DA;
-  --ink: #4A3429;
-  --ink-2: #8B7063;
-  --ink-3: #B49D90;
-  --brand: #F0C2AE;          /* خوخي باستيل – للتعبئة */
-  --brand-strong: #E9AE96;
-  --brand-ink: #5A3324;      /* نص فوق الخوخي */
-  --brand-text: #A35F45;     /* نص ملوّن فوق الأبيض */
-  --brand-soft: #FDE9E0;
-  --lav: #7B62A8; --lav-soft: #EFE8FA;
-  --hero: linear-gradient(135deg, #FBDCCD 0%, #F7D9E6 55%, #E8DDF7 100%);
-  --hero-neg: linear-gradient(135deg, #FBD9D6 0%, #F8E0E0 100%);
-  --bar: #EBAA90;
-  --good: #3A8660;  --good-soft: #E1F3E8;
-  --warn: #A06612; --warn-soft: #FDF1D8;
-  --bad: #C14E4A;  --bad-soft: #FCE4E2;
-  --info: #4572AE; --info-soft: #E5EEFB;
-  --grid: #F5EAE3;
-  --toast: #4A3429; --toast-ink: #FFF8F4;
-  --shadow: 0 1px 2px rgba(165, 100, 80, .05), 0 8px 26px rgba(165, 100, 80, .08);
+  --bg: #F6F3EC;             /* Sand */
+  --bg-glow-1: #EFE4D6;      /* Ash */
+  --bg-glow-2: #E6EBEB;      /* Spring Rain */
+  --surface: #FFFFFF;        /* True White */
+  --surface-2: #F5F2EE;      /* Pearl / Taupe */
+  --line: #E8E2D9;
+  --ink: #45382F;            /* Iron Brown */
+  --ink-2: #7D6D60;
+  --ink-3: #A99D92;
+  --brand: #CDB298;          /* Terracotta – الأزرار */
+  --brand-strong: #C2A487;
+  --brand-ink: #3E3129;
+  --brand-text: #8C705A;     /* Weathered Bronze – نص ملوّن */
+  --brand-soft: #F2E9DD;     /* Ash فاتح */
+  --lav: #5E6B6C; --lav-soft: #E3E8E8;   /* Spring Rain */
+  --hero: linear-gradient(135deg, #EEE1CF 0%, #DCCBBB 100%);   /* Ash → Dusk */
+  --hero-neg: linear-gradient(135deg, #F3E3DC 0%, #E8D2C8 100%);
+  --bar: #CDB298;
+  --good: #4F7A5A;  --good-soft: #E6EEE3;
+  --warn: #8F6417; --warn-soft: #F6EEDC;
+  --bad: #A64A40;  --bad-soft: #F5E4DF;
+  --info: #546E80; --info-soft: #E6EBEC;
+  --grid: #F0ECE5;
+  --toast: #4A3E35; --toast-ink: #FAF8F4;
+  --shadow: 0 1px 2px rgba(69, 56, 47, .04), 0 8px 28px rgba(69, 56, 47, .06);
   --radius: 20px;
   --nav-h: 64px;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1B1517; --bg-glow-1: #2A1E1E; --bg-glow-2: #221D2C;
-    --surface: #251D20; --surface-2: #30262A; --line: #3D3135;
-    --ink: #F7ECE6; --ink-2: #CDB8B0; --ink-3: #94807A;
-    --brand: #F0C2AE; --brand-strong: #F6D3C3; --brand-ink: #3A2118; --brand-text: #F3BFA8; --brand-soft: #3A2A27;
-    --lav: #C7B4EC; --lav-soft: #2E2738;
-    --hero: linear-gradient(135deg, #4A3330 0%, #45303C 55%, #3A3349 100%);
-    --hero-neg: linear-gradient(135deg, #4A2826 0%, #42292B 100%);
-    --bar: #E9AE96;
-    --good: #7DD3A4; --good-soft: #1B3328; --warn: #F2C26E; --warn-soft: #3A2E17;
-    --bad: #F59A93; --bad-soft: #3F2223; --info: #93B8EE; --info-soft: #1C2A3E;
-    --grid: #33292D; --toast: #F7ECE6; --toast-ink: #2A1F22;
+    --bg: #1D1916; --bg-glow-1: #29221D; --bg-glow-2: #222420;
+    --surface: #27211D; --surface-2: #322B26; --line: #3F3731;
+    --ink: #F3ECE1; --ink-2: #C9BCA8; --ink-3: #8F8478;
+    --brand: #C9AE8F; --brand-strong: #D8C0A3; --brand-ink: #2A211B; --brand-text: #D6BE9F; --brand-soft: #3A3029;
+    --lav: #B7B8A2; --lav-soft: #2E302A;
+    --hero: linear-gradient(135deg, #3A3029 0%, #463A30 100%);
+    --hero-neg: linear-gradient(135deg, #46302B 0%, #3D2D29 100%);
+    --bar: #C4A98B;
+    --good: #93BE9C; --good-soft: #233026; --warn: #DDB36C; --warn-soft: #3A3020;
+    --bad: #E39A8E; --bad-soft: #3E2824; --info: #9DB5CC; --info-soft: #232C34;
+    --grid: #342D28; --toast: #F3ECE1; --toast-ink: #27211D;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1B1517; --bg-glow-1: #2A1E1E; --bg-glow-2: #221D2C;
-  --surface: #251D20; --surface-2: #30262A; --line: #3D3135;
-  --ink: #F7ECE6; --ink-2: #CDB8B0; --ink-3: #94807A;
-  --brand: #F0C2AE; --brand-strong: #F6D3C3; --brand-ink: #3A2118; --brand-text: #F3BFA8; --brand-soft: #3A2A27;
-  --lav: #C7B4EC; --lav-soft: #2E2738;
-  --hero: linear-gradient(135deg, #4A3330 0%, #45303C 55%, #3A3349 100%);
-  --hero-neg: linear-gradient(135deg, #4A2826 0%, #42292B 100%);
-  --bar: #E9AE96;
-  --good: #7DD3A4; --good-soft: #1B3328; --warn: #F2C26E; --warn-soft: #3A2E17;
-  --bad: #F59A93; --bad-soft: #3F2223; --info: #93B8EE; --info-soft: #1C2A3E;
-  --grid: #33292D; --toast: #F7ECE6; --toast-ink: #2A1F22;
+  --bg: #1D1916; --bg-glow-1: #29221D; --bg-glow-2: #222420;
+  --surface: #27211D; --surface-2: #322B26; --line: #3F3731;
+  --ink: #F3ECE1; --ink-2: #C9BCA8; --ink-3: #8F8478;
+  --brand: #C9AE8F; --brand-strong: #D8C0A3; --brand-ink: #2A211B; --brand-text: #D6BE9F; --brand-soft: #3A3029;
+  --lav: #B7B8A2; --lav-soft: #2E302A;
+  --hero: linear-gradient(135deg, #3A3029 0%, #463A30 100%);
+  --hero-neg: linear-gradient(135deg, #46302B 0%, #3D2D29 100%);
+  --bar: #C4A98B;
+  --good: #93BE9C; --good-soft: #233026; --warn: #DDB36C; --warn-soft: #3A3020;
+  --bad: #E39A8E; --bad-soft: #3E2824; --info: #9DB5CC; --info-soft: #232C34;
+  --grid: #342D28; --toast: #F3ECE1; --toast-ink: #27211D;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
   color-scheme: dark;
 }
@@ -183,7 +183,7 @@ main {
   display: inline-flex; align-items: center; gap: 8px;
   height: 54px; padding: 0 22px 0 18px; border-radius: 27px; border: 0;
   background: var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 15.5px;
-  box-shadow: 0 8px 24px rgba(220, 140, 110, .35);
+  box-shadow: 0 8px 24px rgba(160, 125, 95, .30);
   transition: transform .15s ease;
 }
 .fab:active { transform: scale(.96); }

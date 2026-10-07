@@ -24,9 +24,12 @@ const EXPENSE_CATS = [
   { id: 'equipment',   label: 'أدوات ومعدات',    emoji: '🍳' },
   { id: 'other',       label: 'أخرى',            emoji: '🧾' },
 ];
-const COLORS = ['#C9A189', '#F2B488', '#A8C98F', '#F1A9C2', '#BBA8E3', '#9EC5E8', '#EBCD80', '#E7A0A0'];
-// تحويل الألوان القديمة الغامقة لنسختها الباستيل
-const OLD_COLORS = { '#7A4A2A': '#C9A189', '#E07B39': '#F2B488', '#6E9A3A': '#A8C98F', '#D45D8C': '#F1A9C2', '#7D5BA6': '#BBA8E3', '#3C7DBF': '#9EC5E8', '#C9A227': '#EBCD80', '#B23A3A': '#E7A0A0' };
+const COLORS = ['#654C3D', '#CDB298', '#8A8A77', '#A39A8D', '#8C705A', '#D8C6B6', '#9FAAAA', '#5F6466'];
+// تحويل ألوان المنتجات القديمة للألوان المحايدة الجديدة
+const OLD_COLORS = {
+  '#7A4A2A': '#654C3D', '#E07B39': '#CDB298', '#6E9A3A': '#8A8A77', '#D45D8C': '#A39A8D', '#7D5BA6': '#8C705A', '#3C7DBF': '#5F6466', '#C9A227': '#D8C6B6', '#B23A3A': '#9FAAAA',
+  '#C9A189': '#654C3D', '#F2B488': '#CDB298', '#A8C98F': '#8A8A77', '#F1A9C2': '#A39A8D', '#BBA8E3': '#8C705A', '#9EC5E8': '#5F6466', '#EBCD80': '#D8C6B6', '#E7A0A0': '#9FAAAA',
+};
 const MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 const PERIODS = { month: 'هذا الشهر', last: 'الشهر الماضي', year: 'هذي السنة', all: 'الكل' };
 const ORDER_FILTERS = { active: 'الحالية', unpaid: 'غير مدفوعة', delivered: 'تم التسليم', cancelled: 'ملغية', all: 'الكل' };
@@ -120,9 +123,9 @@ function defaultState() {
     settings: { name: 'Niwa Cookies', currency: 'ر.س', notify: false, monthlyBudget: 0, backupDays: 7, theme: 'light' },
     meta: { nextOrderNo: 1, lastBackup: null, createdAt: Date.now() },
     products: [
-      product('كلاسيك بلجيكي', 'كوكيز بالشوكولاتة البلجيكية', '#C9A189', 1.5, 5, [{ qty: 4, price: 17 }, { qty: 8, price: 31 }]),
-      product('كندر', 'كوكيز بالشوكولاتة البلجيكية وكندر', '#F2B488', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
-      product('ماتشا', 'كوكيز بالشوكولاتة البلجيكية وماتشا', '#A8C98F', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
+      product('كلاسيك بلجيكي', 'كوكيز بالشوكولاتة البلجيكية', '#654C3D', 1.5, 5, [{ qty: 4, price: 17 }, { qty: 8, price: 31 }]),
+      product('كندر', 'كوكيز بالشوكولاتة البلجيكية وكندر', '#CDB298', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
+      product('ماتشا', 'كوكيز بالشوكولاتة البلجيكية وماتشا', '#8A8A77', 2.5, 6, [{ qty: 4, price: 21 }, { qty: 8, price: 39 }]),
     ],
     orders: [],
     expenses: [],
