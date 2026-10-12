@@ -382,6 +382,7 @@ button.row:hover .row-main strong { color: var(--brand-text); }
 .field.sm input { min-height: 40px; padding: 8px 10px; font-size: 15px; }
 .field.sm > span { font-size: 12px; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+.field-row.three { grid-template-columns: repeat(3, 1fr); }
 .hint { font-size: 12.5px; color: var(--ink-3); }
 .big-input { font-size: 30px !important; font-weight: 700; text-align: center; min-height: 64px !important; }
 

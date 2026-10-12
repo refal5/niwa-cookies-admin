@@ -194,7 +194,7 @@ function bestPrice(qty, unit, packs) {
 const partsText = parts => parts.map(p => p.qty === 1 ? `${p.count} حبة` : `${p.count > 1 ? p.count + '× ' : ''}بوكس ${p.qty}`).join(' + ');
 const lineTotal = it => bestPrice(it.qty, it.price, it.packs).total;
 const orderSubtotal = o => sum(o.items, lineTotal);
-const orderTotal = o => Math.max(0, round2(orderSubtotal(o) - (o.discount || 0) + (o.deliveryFee || 0)));
+const orderTotal = o => round2(Math.max(0, orderSubtotal(o) - (o.discount || 0) + (o.deliveryFee || 0)) + (o.tip || 0));
 const orderPieces = o => sum(o.items, i => i.qty);
 const itemsSummary = o => o.items.map(i => `${i.qty} ${i.name} ${i.size}`).join(' · ');
 
@@ -283,7 +283,7 @@ function waLink(o) {
     `هلا ${o.customer || ''} 🍪`,
     `تفاصيل طلبك رقم #${o.no}:`,
     ...o.items.map(i => `• ${i.qty} ${i.name} ${i.size}`),
-    `الإجمالي: ${moneyText(orderTotal(o))}`,
+    `الإجمالي: ${moneyText(orderTotal(o) - (o.tip || 0))}`,
   ];
   return `https://wa.me/${n}?text=${encodeURIComponent(lines.join('\n'))}`;
 }
@@ -419,6 +419,7 @@ function viewHome() {
   const exps = sum(state.expenses.filter(e => inRange(e.date, r)), e => e.amount);
   const profit = sales - exps;
   const pieces = sum(orders, orderPieces);
+  const tips = sum(orders, o => o.tip || 0);
   const unpaid = state.orders.filter(o => o.status !== 'cancelled' && !o.paid);
   const unpaidSum = sum(unpaid, orderTotal);
   const low = lowStockList();
@@ -435,7 +436,7 @@ function viewHome() {
     `<button class="${ui.period === k ? 'on' : ''}" data-action="period" data-p="${k}" aria-pressed="${ui.period === k}">${v}</button>`).join('')}</div>
   <section class="kpis">
     <div class="kpi hero ${profit < 0 ? 'neg' : ''}"><span class="kpi-label">صافي الربح</span><span class="kpi-value">${money(profit)}</span><span class="kpi-sub">المبيعات − المصاريف</span></div>
-    <div class="kpi"><span class="kpi-label">المبيعات</span><span class="kpi-value">${money(sales)}</span></div>
+    <div class="kpi"><span class="kpi-label">المبيعات</span><span class="kpi-value">${money(sales)}</span>${tips ? `<span class="kpi-sub">منها إكراميات ${moneyText(tips)} 🎁</span>` : ''}</div>
     <div class="kpi"><span class="kpi-label">المصاريف</span><span class="kpi-value">${money(exps)}</span></div>
     <div class="kpi"><span class="kpi-label">الطلبات</span><span class="kpi-value"><span class="num">${orders.length}</span></span><span class="kpi-sub">${pieces} حبة</span></div>
     <button class="kpi tap" data-action="goto-unpaid"><span class="kpi-label">مبالغ ما انحصلت</span><span class="kpi-value ${unpaidSum ? 't-warn' : ''}">${money(unpaidSum)}</span><span class="kpi-sub">${unpaid.length} طلب</span></button>
@@ -596,6 +597,7 @@ function orderCard(o) {
     ${o.notes ? `<div class="oc-note">${esc(o.notes)}</div>` : ''}
     <div class="oc-meta">${dueBadge(o)}
       ${o.status !== 'cancelled' ? (o.paid ? `<span class="badge tone-good">${icon('check')}مدفوع${o.payMethod ? ' · ' + esc(o.payMethod) : ''}</span>` : `<span class="badge tone-warn">غير مدفوع</span>`) : ''}
+      ${o.tip ? `<span class="badge tone-good">🎁 إكرامية ${fmtNum(o.tip)}</span>` : ''}
       <span class="oc-total">${money(orderTotal(o))}</span></div>
     <div class="oc-actions">
       <select class="status-select" data-change="order-status" data-id="${o.id}" aria-label="حالة الطلب">${STATUS_ORDER.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${STATUSES[s].label}</option>`).join('')}</select>
@@ -614,7 +616,7 @@ function openOrderSheet(id) {
     draft.items.set(k, { ...it, packs: it.packs || [] });
     if (o.status !== 'cancelled') draft.orig.set(k, it.qty);
   }
-  const v = o || { customer: '', phone: '', date: today(), deliveryDate: today(), status: 'new', paid: false, payMethod: PAY_METHODS[0], discount: 0, deliveryFee: 0, notes: '' };
+  const v = o || { customer: '', phone: '', date: today(), deliveryDate: today(), status: 'new', paid: false, payMethod: PAY_METHODS[0], discount: 0, deliveryFee: 0, tip: 0, notes: '' };
   const customers = uniqueCustomers();
   const body = `<form id="order-form" class="form" data-submit="save-order" autocomplete="off">
     <div class="field-row">
@@ -623,9 +625,10 @@ function openOrderSheet(id) {
     </div>
     <datalist id="customers-dl">${[...customers.keys()].map(c => `<option value="${esc(c)}">`).join('')}</datalist>
     <fieldset class="field"><legend>وش طلب؟</legend>${pickerHTML('order')}</fieldset>
-    <div class="field-row">
-      <label class="field"><span>خصم (${esc(state.settings.currency)})</span><input name="discount" inputmode="decimal" value="${v.discount || ''}" placeholder="0" data-totals></label>
-      <label class="field"><span>رسوم التوصيل</span><input name="deliveryFee" inputmode="decimal" value="${v.deliveryFee || ''}" placeholder="0" data-totals></label>
+    <div class="field-row three">
+      <label class="field"><span>خصم</span><input name="discount" inputmode="decimal" value="${v.discount || ''}" placeholder="0" data-totals></label>
+      <label class="field"><span>التوصيل</span><input name="deliveryFee" inputmode="decimal" value="${v.deliveryFee || ''}" placeholder="0" data-totals></label>
+      <label class="field"><span>إكرامية 🎁</span><input name="tip" inputmode="decimal" value="${v.tip || ''}" placeholder="0" data-totals></label>
     </div>
     <div class="totals" id="order-totals"></div>
     <div class="field-row">
@@ -724,14 +727,15 @@ function updateOrderTotals() {
   if (!f || !draft) return;
   const items = [...draft.items.values()].filter(i => i.qty > 0);
   const sub = sum(items, lineTotal);
-  const disc = num(f.discount.value), fee = num(f.deliveryFee.value);
+  const disc = num(f.discount.value), fee = num(f.deliveryFee.value), tip = num(f.tip.value);
   const over = items.some(i => { const s = findSize(i.productId, i.sizeId); return s && i.qty > s.stock + (draft.orig.get(`${i.productId}:${i.sizeId}`) || 0); });
   $('#order-totals').innerHTML = `
     <div><span>عدد الحبات</span><b>${sum(items, i => i.qty)}</b></div>
     <div><span>المجموع</span><b>${money(sub)}</b></div>
     ${disc ? `<div><span>الخصم</span><b>− ${money(disc)}</b></div>` : ''}
     ${fee ? `<div><span>التوصيل</span><b>+ ${money(fee)}</b></div>` : ''}
-    <div class="grand"><span>الإجمالي</span><b>${money(Math.max(0, sub - disc + fee))}</b></div>
+    ${tip ? `<div><span>إكرامية 🎁</span><b>+ ${money(tip)}</b></div>` : ''}
+    <div class="grand"><span>الإجمالي</span><b>${money(Math.max(0, sub - disc + fee) + tip)}</b></div>
     ${over ? `<div class="warnline">⚠️ بعض الكميات أكثر من المتوفر — المخزون بيصير بالسالب لين تضيف دفعة</div>` : ''}`;
 }
 function saveOrder() {
@@ -749,6 +753,7 @@ function saveOrder() {
     payMethod: f.payMethod.value,
     discount: num(f.discount.value),
     deliveryFee: num(f.deliveryFee.value),
+    tip: num(f.tip.value),
     notes: f.notes.value.trim(),
     items,
   };
