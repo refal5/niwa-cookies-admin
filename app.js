@@ -192,8 +192,9 @@ function bestPrice(qty, unit, packs) {
   return { total: round2(cost[qty]), parts };
 }
 const partsText = parts => parts.map(p => p.qty === 1 ? `${p.count} حبة` : `${p.count > 1 ? p.count + '× ' : ''}بوكس ${p.qty}`).join(' + ');
-const lineTotal = it => bestPrice(it.qty, it.price, it.packs).total;
-const orderSubtotal = o => sum(o.items, lineTotal);
+// pricing: 'packs' = بالعروض (4 و 8) | 'unit' = بسعر الحبة
+const lineTotal = (it, o) => o?.pricing === 'unit' ? round2(it.qty * it.price) : bestPrice(it.qty, it.price, it.packs).total;
+const orderSubtotal = o => sum(o.items, i => lineTotal(i, o));
 const orderTotal = o => round2(Math.max(0, orderSubtotal(o) - (o.discount || 0) + (o.deliveryFee || 0)) + (o.tip || 0));
 const orderPieces = o => sum(o.items, i => i.qty);
 const itemsSummary = o => o.items.map(i => `${i.qty} ${i.name} ${i.size}`).join(' · ');
@@ -485,7 +486,7 @@ function bestSellers(orders) {
   const m = new Map();
   for (const o of orders) for (const i of o.items) {
     const cur = m.get(i.productId) || { name: i.name, qty: 0, sales: 0 };
-    cur.qty += i.qty; cur.sales += lineTotal(i);
+    cur.qty += i.qty; cur.sales += lineTotal(i, o);
     m.set(i.productId, cur);
   }
   const rows = [...m].sort((a, b) => b[1].qty - a[1].qty).slice(0, 6);
@@ -597,6 +598,7 @@ function orderCard(o) {
     ${o.notes ? `<div class="oc-note">${esc(o.notes)}</div>` : ''}
     <div class="oc-meta">${dueBadge(o)}
       ${o.status !== 'cancelled' ? (o.paid ? `<span class="badge tone-good">${icon('check')}مدفوع${o.payMethod ? ' · ' + esc(o.payMethod) : ''}</span>` : `<span class="badge tone-warn">غير مدفوع</span>`) : ''}
+      ${o.pricing === 'unit' ? `<span class="badge">بسعر الحبة</span>` : ''}
       ${o.tip ? `<span class="badge tone-good">🎁 إكرامية ${fmtNum(o.tip)}</span>` : ''}
       <span class="oc-total">${money(orderTotal(o))}</span></div>
     <div class="oc-actions">
@@ -610,7 +612,7 @@ function orderCard(o) {
 
 function openOrderSheet(id) {
   const o = id ? state.orders.find(x => x.id === id) : null;
-  draft = { kind: 'order', id, items: new Map(), orig: new Map() };
+  draft = { kind: 'order', id, items: new Map(), orig: new Map(), pricing: o?.pricing || 'packs' };
   if (o) for (const it of o.items) {
     const k = `${it.productId}:${it.sizeId}`;
     draft.items.set(k, { ...it, packs: it.packs || [] });
@@ -624,6 +626,10 @@ function openOrderSheet(id) {
       <label class="field"><span>رقم الجوال</span><input name="phone" type="tel" inputmode="tel" dir="ltr" value="${esc(v.phone)}" placeholder="05xxxxxxxx"></label>
     </div>
     <datalist id="customers-dl">${[...customers.keys()].map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+    <div class="field"><span>طريقة الحساب</span><div class="chips">
+      <label class="chip"><input type="radio" name="pricing" value="packs" data-change="pricing" ${draft.pricing !== 'unit' ? 'checked' : ''}><span>بالعروض (بوكس 4 و 8)</span></label>
+      <label class="chip"><input type="radio" name="pricing" value="unit" data-change="pricing" ${draft.pricing === 'unit' ? 'checked' : ''}><span>بسعر الحبة</span></label>
+    </div></div>
     <fieldset class="field"><legend>وش طلب؟</legend>${pickerHTML('order')}</fieldset>
     <div class="field-row three">
       <label class="field"><span>خصم</span><input name="discount" inputmode="decimal" value="${v.discount || ''}" placeholder="0" data-totals></label>
@@ -693,6 +699,7 @@ function pickRow(scope, k, p, s, orphan) {
     </div></div>`;
 }
 function calcText(it) {
+  if (draft?.pricing === 'unit') return `${it.qty} × ${fmtNum(it.price)} = ${moneyText(it.qty * it.price)}`;
   const r = bestPrice(it.qty, it.price, it.packs);
   const usesPack = r.parts.some(p => p.qty > 1);
   return `${usesPack ? partsText(r.parts) + ' = ' : ''}${moneyText(r.total)}`;
@@ -726,7 +733,7 @@ function updateOrderTotals() {
   const f = $('#order-form');
   if (!f || !draft) return;
   const items = [...draft.items.values()].filter(i => i.qty > 0);
-  const sub = sum(items, lineTotal);
+  const sub = sum(items, i => lineTotal(i, draft));
   const disc = num(f.discount.value), fee = num(f.deliveryFee.value), tip = num(f.tip.value);
   const over = items.some(i => { const s = findSize(i.productId, i.sizeId); return s && i.qty > s.stock + (draft.orig.get(`${i.productId}:${i.sizeId}`) || 0); });
   $('#order-totals').innerHTML = `
@@ -753,6 +760,7 @@ function saveOrder() {
     payMethod: f.payMethod.value,
     discount: num(f.discount.value),
     deliveryFee: num(f.deliveryFee.value),
+    pricing: draft.pricing,
     tip: num(f.tip.value),
     notes: f.notes.value.trim(),
     items,
@@ -1307,6 +1315,11 @@ document.addEventListener('change', e => {
   const t = e.target;
   const kind = t.dataset.change;
   if (kind === 'order-status') setOrderStatus(t.dataset.id, t.value);
+  else if (kind === 'pricing' && draft?.kind === 'order') {
+    draft.pricing = t.value;
+    for (const [k, it] of draft.items) { const c = $(`[data-calc="${k}"]`); if (c) c.textContent = it.qty ? calcText(it) : ''; }
+    updateOrderTotals();
+  }
   else if (kind === 'setting') {
     const k = t.dataset.key;
     state.settings[k] = k === 'backupDays' ? Number(t.value) : t.value;

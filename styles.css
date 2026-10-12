@@ -214,6 +214,7 @@ main {
 .chip { position: relative; }
 .chip input { position: absolute; opacity: 0; pointer-events: none; }
 .chip span { cursor: pointer; }
+.chip input:checked + span::before { content: "✓"; font-weight: 700; }
 .chip input:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* ===== Banners ===== */
